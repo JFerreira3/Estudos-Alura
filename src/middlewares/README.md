@@ -1,0 +1,1 @@
+middlewares são funções especiais passadas para o método app.use que servem para interceptar as requisições feitas para a API
