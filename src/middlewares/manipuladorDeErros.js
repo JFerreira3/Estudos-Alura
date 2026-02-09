@@ -1,12 +1,28 @@
 import mongoose from "mongoose";
+import ErroBase from "../erros/erroBase.js";
+import RequisicaoIncorreta from "../erros/RequisicaoIncorreta.js";
+import ErroValidacao from "../erros/ErroValidacao.js"
+
+
 function manipuladorDeErros(erro, req, res, next) {
-    // midware utilizado para tratar erros e reutilizar código
+
+    // middleware utilizado para tratar erros e reutilizar código
+
+    console.log(erro);  // imprime o erro para a pessoa desenvolvedora
 
     if (erro instanceof mongoose.Error.CastError) {
         // erro de bad request para se pesquisarem por um formato de id do mongoDB incorreto
-        res.status(400).send({ message: 'Um ou mais dados fornecidos estão incorretos.' })
+        new RequisicaoIncorreta().enviarResposta(res);
+        // res.status(400).send({ message: 'Um ou mais dados fornecidos estão incorretos.' })
+    } else if (erro instanceof mongoose.Error.ValidationError) {
+        // erros de validação
+        // quando é um erro de validação do mongoose.Error.ValidationError, o erro possui a propriedade errors (erro.errors)
+       
+        new ErroValidacao(erro).enviarResposta(res);
+        // res.status(400).send({message: `Os seguintes erros foram encontrados: ${mensagensErro}`});        
+    } else {
+        new ErroBase().enviarResposta(res);
     }
-    res.status(500).send({ message: 'Erro interno de servidor.' });
 
 };
 
