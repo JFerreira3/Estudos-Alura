@@ -1,4 +1,4 @@
-import livros from "../models/Livro.js";
+import { livros } from "../models/index.js";
 
 class LivroController {
 
@@ -64,7 +64,7 @@ class LivroController {
   static excluirLivro = async (req, res, next) => {
     try {
       const id = req.params.id;
-      
+
       const livroResultado = await livros.findByIdAndDelete(id);
 
       if (livroResultado !== null) {
