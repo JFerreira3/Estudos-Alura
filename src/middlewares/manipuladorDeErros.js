@@ -1,8 +1,7 @@
 import mongoose from "mongoose";
-import ErroBase from "../erros/erroBase.js";
+import ErroBase from "../erros/ErroBase.js";
 import RequisicaoIncorreta from "../erros/RequisicaoIncorreta.js";
 import ErroValidacao from "../erros/ErroValidacao.js"
-import NaoEncontrado from "../erros/NaoEncontrado.js";
 
 
 function manipuladorDeErros(erro, req, res, next) { // mddlewares de tratamento de erros recebem 4 parametros
@@ -21,7 +20,7 @@ function manipuladorDeErros(erro, req, res, next) { // mddlewares de tratamento 
 
         new ErroValidacao(erro).enviarResposta(res);
         // res.status(400).send({message: `Os seguintes erros foram encontrados: ${mensagensErro}`});        
-    } else if (erro instanceof NaoEncontrado) {
+    } else if (erro instanceof ErroBase) {
         erro.enviarResposta(res);
     } else {
         new ErroBase().enviarResposta(res);
