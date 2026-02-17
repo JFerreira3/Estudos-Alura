@@ -1,28 +1,13 @@
 import { autores, livros } from "../models/index.js";
-import RequisicaoIncorreta from "../erros/RequisicaoIncorreta.js";
 
 class LivroController {
 
   static listarLivros = async (req, res, next) => {
 
     try {
-      let { limite = 5, pagina = 1 } = req.query;
-
-      limite = parseInt(limite);
-      pagina = parseInt(pagina);
-
-      if (limite > 0 && pagina > 0) {
-        const livrosResultado = await livros.find()
-          .skip((pagina - 1) * limite)
-          .limit(limite)
-          .populate("autor")
-          .exec();
-
-        res.status(200).json(livrosResultado);
-      } else {
-        next(new RequisicaoIncorreta());
-      }
-
+      const buscaLivros = livros.find();
+      req.resultado = buscaLivros;
+      next();
 
     } catch (erro) {
       next(erro); // next enviando erro para ser tratdo pelo middleware ../middlewares/manipuladorDeErros.js
@@ -33,14 +18,12 @@ class LivroController {
     try {
       const id = req.params.id;
 
-      const livroResultado = await livros.findById(id)
-        .populate("autor", "nome")
-        .exec();
+      const livroResultado = await livros.findById(id);
 
       if (livroResultado !== null) {
         res.status(200).send(livroResultado);
       } else {
-        next(new NaoEncontrado("Id do livro não localizado."));
+        next();
       }
     } catch (erro) {
       next(erro); // next enviando erro para ser tratdo pelo middleware ../middlewares/manipuladorDeErros.js
@@ -68,7 +51,7 @@ class LivroController {
       if (livroResultado !== null) {
         res.status(200).send({ message: "Livro atualizado com sucesso" });
       } else {
-        next(new NaoEncontrado("Id do livro não localizado."));
+        next();
       }
     } catch (erro) {
       next(erro); // next enviando erro para ser tratdo pelo middleware ../middlewares/manipuladorDeErros.js
@@ -84,7 +67,7 @@ class LivroController {
       if (livroResultado !== null) {
         res.status(200).send({ message: "Livro removido com sucesso" });
       } else {
-        next(new NaoEncontrado("Id do livro não localizado."));
+        next();
       }
     } catch (erro) {
       next(erro); // next enviando erro para ser tratado pelo middleware ../middlewares/manipuladorDeErros.js
@@ -96,11 +79,10 @@ class LivroController {
       const busca = await processaBusca(req.query);
 
       if (busca !== null) {
-        const livrosResultado = await livros
-          .find(busca)
-          .populate("autor");
+        const livrosResultado = livros.find(busca);
 
-        res.status(200).send(livrosResultado);
+        req.resultado = livrosResultado;
+        next();
       } else {
         res.status(200).send([]);
       }

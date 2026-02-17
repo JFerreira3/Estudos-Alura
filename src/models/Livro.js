@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import autopopulate from "mongoose-autopopulate";
 
 const livroSchema = new mongoose.Schema(
   {
@@ -7,7 +8,12 @@ const livroSchema = new mongoose.Schema(
       type: String,
       required: [true, "O título do erro é obrigatório"]  // campo obrigatório e mongoose habilita colocar mensagem de erro personalizada que será utilizada no middleware manipulador de erro
     },
-    autor: { type: mongoose.Schema.Types.ObjectId, ref: 'autores', required: [true, "O autor(a) é obrigatório"] },
+    autor: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'autores',
+      required: [true, "O autor(a) é obrigatório"],
+      autopopulate: true
+    },
     editora: {
       type: String,
       required: [true, "A editora é obrigatória"],
@@ -20,7 +26,7 @@ const livroSchema = new mongoose.Schema(
       type: Number,
       // min: [10, "O número de páginas deve estar entre 10 e 5000. Valor fornecido: {VALUE}"],
       // max: [5000, "O número de páginas deve estar entre 10 e 5000. Valor fornecido: {VALUE}"],
-      
+
       // EXEMPLO DE VALIDAÇÃO PERSONALIZADA (precisa ser na propriedade "validate"):  
       validate: {
         validator: (valor) => {
@@ -32,6 +38,7 @@ const livroSchema = new mongoose.Schema(
   }
 );
 
+livroSchema.plugin(autopopulate);
 const livros = mongoose.model('livros', livroSchema);
 
 export default livros;
